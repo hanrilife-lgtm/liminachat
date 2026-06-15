@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limina — Твой круг</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="limina.css">
+</head>
+<body>
+    <div class="bg-gradient"></div>
+
+    <!-- Экран авторизации -->
+    <div id="authScreen">
+        <div class="auth-container">
+            <h1 class="auth-logo">Limina</h1>
+            <div class="auth-form">
+                <input type="tel" id="phoneInput" placeholder="Номер телефона" maxlength="15">
+                <button id="sendCodeBtn" class="send-code-btn"><i class='bx bx-message-detail'></i> Получить код</button>
+                <div id="codeSection" class="hidden">
+                    <input type="text" id="codeInput" placeholder="Код из SMS" maxlength="6">
+                    <button id="verifyCodeBtn" class="verify-code-btn"><i class='bx bx-check'></i> Подтвердить</button>
+                    <p class="auth-hint">Демо-код: <strong>1234</strong></p>
+                </div>
+                <p class="auth-error" id="authError"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно: задать юзернейм -->
+    <div class="modal hidden" id="usernameModal">
+        <div class="modal__content">
+            <h3>Придумайте юзернейм</h3>
+            <input type="text" id="usernameInput" placeholder="Ваш уникальный ник" maxlength="20">
+            <p class="auth-error" id="usernameError"></p>
+            <div class="modal__actions">
+                <button class="modal__btn modal__btn--confirm" id="confirmUsernameBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Главный экран: список чатов -->
+    <div id="mainScreen" class="hidden">
+        <div class="top-bar">
+            <button class="avatar-btn" id="profileAvatarBtn" title="Профиль"><span id="topAvatar">A</span></button>
+            <h1 class="logo">Limina</h1>
+            <div class="top-bar__right">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Поиск по юзернейму...">
+                    <button class="icon-btn" id="searchBtn"><i class='bx bx-search'></i></button>
+                </div>
+                <button class="icon-btn" id="themeToggle" title="Сменить тему"><i class='bx bx-moon'></i></button>
+                <button class="icon-btn" id="logoutBtn" title="Выйти"><i class='bx bx-log-out'></i></button>
+            </div>
+        </div>
+        <main class="main">
+            <div class="chat-list" id="chatListContainer"></div>
+            <button class="add-chat-btn" id="addThresholdBtn" title="Создать чат"><i class='bx bx-plus'></i> Новый чат</button>
+        </main>
+    </div>
+
+    <!-- Профиль -->
+    <div id="profileScreen" class="profile-screen hidden">
+        <div class="profile-container">
+            <button class="profile-back" id="profileBackBtn"><i class='bx bx-arrow-back'></i> Назад</button>
+            <div class="profile-avatar" id="profileAvatarBig">A</div>
+            <h2 class="profile-name" id="profileNameDisplay">Имя</h2>
+            <p class="profile-username" id="profileUsernameDisplay">@username</p>
+            <p class="profile-phone hidden" id="profilePhoneDisplay">+7 000 000-00-00</p>
+            <div class="profile-bio">
+                <label>Статус</label>
+                <input type="text" id="profileBioInput" placeholder="Напишите что-нибудь о себе..." maxlength="60">
+            </div>
+            <div class="profile-settings">
+                <div class="profile-setting">
+                    <span>Тёмная тема</span>
+                    <button class="toggle-switch" id="profileThemeToggle"><i class='bx bx-moon'></i></button>
+                </div>
+                <div class="profile-setting">
+                    <span>Звук уведомлений</span>
+                    <button class="toggle-switch" id="profileSoundToggle"><i class='bx bx-volume-full'></i></button>
+                </div>
+            </div>
+            <div class="profile-actions">
+                <button class="profile-btn" id="profileToGatesBtn"><i class='bx bx-door-open'></i> Мои чаты</button>
+                <button class="profile-btn" id="profileChangeUsernameBtn"><i class='bx bx-edit'></i> Сменить юзернейм</button>
+                <button class="profile-btn" id="profileChangePasswordBtn"><i class='bx bx-lock'></i> Сменить пароль</button>
+                <button class="profile-btn profile-btn--logout" id="profileLogoutBtn"><i class='bx bx-log-out'></i> Выйти</button>
+                <button class="profile-btn profile-btn--danger" id="profileDeleteAccountBtn"><i class='bx bx-trash'></i> Удалить аккаунт</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Чат -->
+    <div id="chatScreen" class="chat-screen hidden">
+        <header class="chat-header">
+            <button class="icon-btn" id="backBtn"><i class='bx bx-arrow-back'></i></button>
+            <h2 class="chat-header__title" id="chatTitle"></h2>
+            <div class="chat-header__actions">
+                <button class="icon-btn" id="chatSearchBtn" title="Поиск в чате"><i class='bx bx-search-alt-2'></i></button>
+                <button class="icon-btn" id="soundToggle" title="Звук"><i class='bx bx-volume-full'></i></button>
+                <button class="icon-btn" id="membersBtn" title="Участники"><i class='bx bx-group'></i></button>
+                <button class="icon-btn" id="memoriesBtn" title="Воспоминания"><i class='bx bx-time-five'></i></button>
+                <button class="icon-btn" id="chatThemeToggle" title="Сменить тему"><i class='bx bx-moon'></i></button>
+                <button class="icon-btn" id="gateSettingsBtn" title="Настройки чата"><i class='bx bx-cog'></i></button>
+            </div>
+        </header>
+        <div id="pinnedMessages" class="pinned-area hidden"></div>
+        <div class="chat-messages" id="messagesContainer"></div>
+        <div id="typingIndicator" class="typing-indicator hidden"></div>
+        <div class="chat-input">
+            <div class="chat-input__tools">
+                <button class="tool-btn" id="emojiBtn" title="Эмодзи"><i class='bx bx-smile'></i></button>
+                <button class="tool-btn" id="voiceBtn" title="Голосовое сообщение"><i class='bx bx-microphone'></i></button>
+                <div class="reply-preview hidden" id="replyPreview">
+                    <span id="replyPreviewText"></span>
+                    <button id="cancelReplyBtn"><i class='bx bx-x'></i></button>
+                </div>
+            </div>
+            <textarea id="messageInput" placeholder="Сообщение..." rows="1"></textarea>
+            <button class="send-btn" id="sendBtn"><i class='bx bx-send'></i></button>
+        </div>
+        <div id="emojiPicker" class="emoji-picker hidden">
+            <input type="text" id="emojiSearch" placeholder="Поиск эмодзи...">
+            <div id="emojiGrid" class="emoji-grid"></div>
+        </div>
+    </div>
+
+    <!-- Контекстное меню -->
+    <div class="context-menu hidden" id="contextMenu">
+        <button class="context-menu__item" id="ctxReply"><i class='bx bx-reply'></i> Ответить</button>
+        <button class="context-menu__item" id="ctxCopy"><i class='bx bx-copy'></i> Копировать</button>
+        <button class="context-menu__item" id="ctxForward"><i class='bx bx-forward'></i> Переслать</button>
+        <button class="context-menu__item" id="ctxPin"><i class='bx bx-pin'></i> Закрепить</button>
+        <button class="context-menu__item" id="ctxEdit"><i class='bx bx-edit'></i> Редактировать</button>
+        <button class="context-menu__item" id="ctxDelete"><i class='bx bx-trash'></i> Удалить</button>
+    </div>
+
+    <!-- Модальные окна (остальные) -->
+    <div class="modal hidden" id="chatSearchModal">
+        <div class="modal__content">
+            <h3>Поиск в чате</h3>
+            <input type="text" id="chatSearchInput" placeholder="Введите текст...">
+            <div id="searchResults" class="search-results"></div>
+            <div class="modal__actions">
+                <button class="modal__btn modal__btn--cancel" id="closeChatSearchBtn">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="forwardModal">
+        <div class="modal__content">
+            <h3>Переслать в...</h3>
+            <div id="forwardChatList" class="forward-chat-list"></div>
+            <div class="modal__actions">
+                <button class="modal__btn modal__btn--cancel" id="cancelForwardBtn">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="changeUsernameModal">
+        <div class="modal__content">
+            <h3>Новый юзернейм</h3>
+            <input type="text" id="newUsernameInput" placeholder="Введите новый ник" maxlength="20">
+            <p class="auth-error" id="changeUsernameError"></p>
+            <div class="modal__actions">
+                <button class="modal__btn modal__btn--cancel" id="cancelChangeUsernameBtn">Отмена</button>
+                <button class="modal__btn modal__btn--confirm" id="confirmChangeUsernameBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="changePasswordModal">
+        <div class="modal__content">
+            <h3>Смена пароля</h3>
+            <input type="password" id="oldPasswordInput" placeholder="Старый пароль">
+            <input type="password" id="newPasswordInput" placeholder="Новый пароль">
+            <p class="auth-error" id="changePasswordError"></p>
+            <div class="modal__actions">
+                <button class="modal__btn modal__btn--cancel" id="cancelChangePasswordBtn">Отмена</button>
+                <button class="modal__btn modal__btn--confirm" id="confirmChangePasswordBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="deleteAccountModal">
+        <div class="modal__content">
+            <h3>Удаление аккаунта</h3>
+            <p>Это действие необратимо. Все ваши данные будут удалены.</p>
+            <div class="modal__actions">
+                <button class="modal__btn modal__btn--cancel" id="cancelDeleteAccountBtn">Отмена</button>
+                <button class="modal__btn modal__btn--danger" id="confirmDeleteAccountBtn">Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="gateModal">
+        <div class="modal__content">
+            <h3 id="gateModalTitle">Новый чат</h3>
+            <input type="text" id="gateNameInput" placeholder="Название чата" maxlength="20">
+            <input type="text" id="gateIconInput" placeholder="Иконка (bx bx-home)" maxlength="30">
+            <div class="modal__actions">
+                <button class="modal__btn modal__btn--cancel" id="cancelGateBtn">Отмена</button>
+                <button class="modal__btn modal__btn--confirm" id="confirmGateBtn">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="inviteModal">
+        <div class="modal__content">
+            <h3>Пригласить в чат</h3>
+            <input type="text" id="inviteUsername" placeholder="Юзернейм">
+            <div class="modal__actions">
+                <button class="modal__btn modal__btn--cancel" id="cancelInviteBtn">Отмена</button>
+                <button class="modal__btn modal__btn--confirm" id="confirmInviteBtn">Пригласить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="membersModal">
+        <div class="modal__content">
+            <h3>Участники чата</h3>
+            <ul class="members-list" id="membersList"></ul>
+            <div class="modal__actions">
+                <button class="modal__btn modal__btn--cancel" id="closeMembersBtn">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="timeModal">
+        <div class="modal__content">
+            <h3 id="modalTitle">Когда доставить?</h3>
+            <input type="datetime-local" id="timeInput">
+            <div class="modal__actions">
+                <button class="modal__btn modal__btn--cancel" id="cancelTimeBtn">Отмена</button>
+                <button class="modal__btn modal__btn--confirm" id="confirmTimeBtn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="limina.js"></script>
+</body>
+</html>
